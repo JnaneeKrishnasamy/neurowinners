@@ -111,30 +111,214 @@ startxref
     URL.revokeObjectURL(url)
   }
 
+  const analyzeWorkContext = (prompt: string) => {
+    const lowerPrompt = prompt.toLowerCase()
+    
+    // Profession detection
+    const professionKeywords = {
+      veterinarian: ['vet', 'veterinarian', 'veterinary', 'animal doctor'],
+      lawyer: ['lawyer', 'attorney', 'legal counsel', 'solicitor', 'barrister'],
+      teacher: ['teacher', 'educator', 'instructor', 'professor'],
+      nurse: ['nurse', 'nursing', 'rn', 'lpn'],
+      engineer: ['engineer', 'engineering'],
+      developer: ['developer', 'programmer', 'software engineer', 'coder'],
+      designer: ['designer', 'design', 'ux', 'ui'],
+      accountant: ['accountant', 'accounting', 'cpa', 'bookkeeper'],
+      manager: ['manager', 'management', 'supervisor', 'director'],
+      consultant: ['consultant', 'consulting', 'advisor']
+    }
+
+    // Work environment detection
+    const environmentKeywords = {
+      // Veterinary environments
+      'small animal clinic': ['small animal', 'companion animal', 'pet clinic', 'small clinic'],
+      'large animal practice': ['large animal', 'farm animal', 'livestock', 'equine'],
+      'emergency vet clinic': ['emergency', 'er', '24 hour', 'critical care'],
+      'veterinary hospital': ['hospital', 'large practice', 'multi-doctor'],
+      
+      // Legal environments
+      'big law firm': ['big firm', 'large firm', 'corporate firm', 'biglaw', 'major firm'],
+      'small law firm': ['small firm', 'boutique', 'solo practice', 'small practice'],
+      'public defender': ['public defender', 'legal aid', 'pro bono'],
+      'corporate legal': ['in-house', 'corporate counsel', 'company lawyer'],
+      
+      // Healthcare environments
+      'hospital': ['hospital', 'medical center', 'health system'],
+      'private practice': ['private practice', 'clinic', 'medical office'],
+      'urgent care': ['urgent care', 'walk-in clinic'],
+      
+      // Education environments
+      'elementary school': ['elementary', 'primary school', 'k-5', 'grade school'],
+      'high school': ['high school', 'secondary', 'grades 9-12'],
+      'university': ['university', 'college', 'higher education'],
+      'special education': ['special ed', 'special needs', 'iep'],
+      
+      // Tech environments
+      'startup': ['startup', 'start-up', 'early stage'],
+      'big tech': ['big tech', 'faang', 'large company', 'tech giant'],
+      'remote work': ['remote', 'work from home', 'distributed team'],
+      'agency': ['agency', 'consulting firm', 'client work'],
+      
+      // General environments
+      'open office': ['open office', 'shared workspace', 'cubicle'],
+      'home office': ['home office', 'work from home', 'remote'],
+      'fast-paced': ['fast-paced', 'high pressure', 'deadline driven'],
+      'team-based': ['team', 'collaborative', 'group work']
+    }
+
+    // Detect profession
+    let profession = 'Professional'
+    for (const [prof, keywords] of Object.entries(professionKeywords)) {
+      if (keywords.some(keyword => lowerPrompt.includes(keyword))) {
+        profession = prof
+        break
+      }
+    }
+
+    // Detect work environment
+    let environment = null
+    for (const [env, keywords] of Object.entries(environmentKeywords)) {
+      if (keywords.some(keyword => lowerPrompt.includes(keyword))) {
+        environment = env
+        break
+      }
+    }
+
+    // Detect condition
+    const conditions = ['ADHD', 'autism', 'dyslexia', 'bipolar', 'anxiety', 'depression']
+    const condition = conditions.find(cond => lowerPrompt.includes(cond.toLowerCase())) || 'neurodiverse'
+
+    // Detect specific challenges
+    const challenges = []
+    const challengeKeywords = {
+      'time management': ['time management', 'scheduling', 'deadlines', 'procrastination'],
+      'organization': ['organization', 'organizing', 'clutter', 'messy'],
+      'focus': ['focus', 'concentration', 'distraction', 'attention'],
+      'communication': ['communication', 'social', 'meetings', 'presentations'],
+      'sensory': ['sensory', 'noise', 'lighting', 'overstimulation'],
+      'memory': ['memory', 'forgetful', 'remember', 'recall']
+    }
+
+    for (const [challenge, keywords] of Object.entries(challengeKeywords)) {
+      if (keywords.some(keyword => lowerPrompt.includes(keyword))) {
+        challenges.push(challenge)
+      }
+    }
+
+    return { profession, environment, condition, challenges }
+  }
+
+  const generateEnvironmentSpecificTips = (profession: string, environment: string, condition: string) => {
+    const tips = {
+      // Veterinary specific tips
+      'small animal clinic': {
+        'Environment Setup': 'Use color-coded appointment books and patient files. Keep frequently used supplies in designated, labeled drawers.',
+        'Patient Management': 'Create visual patient status boards. Use timer apps for appointment scheduling and treatment reminders.',
+        'Communication': 'Prepare scripts for common client conversations about treatment plans and costs.',
+        'Stress Management': 'Take micro-breaks between appointments. Use noise-canceling headphones during paperwork time.'
+      },
+      'large animal practice': {
+        'Equipment Organization': 'Use mobile organization systems for farm calls. Create checklists for different types of visits.',
+        'Travel Planning': 'Plan routes efficiently using GPS apps. Keep emergency supplies organized in vehicle.',
+        'Physical Demands': 'Use ergonomic tools and take regular stretching breaks. Plan energy-intensive tasks for peak hours.',
+        'Weather Adaptation': 'Prepare sensory-friendly gear for different weather conditions.'
+      },
+      'emergency vet clinic': {
+        'Crisis Management': 'Use triage protocols and visual priority systems. Practice stress-reduction techniques for high-pressure situations.',
+        'Shift Work': 'Maintain consistent sleep schedules. Use light therapy for circadian rhythm regulation.',
+        'Emotional Regulation': 'Develop coping strategies for difficult cases. Create quiet spaces for decompression.',
+        'Team Communication': 'Use clear, direct communication protocols. Establish hand signals for noisy environments.'
+      },
+
+      // Legal specific tips
+      'big law firm': {
+        'Billable Hours': 'Use detailed time-tracking apps with automatic reminders. Break large projects into billable chunks.',
+        'Client Management': 'Create templates for client communications. Use CRM systems to track interactions.',
+        'Document Review': 'Use highlighting systems and digital annotation tools. Take regular eye breaks.',
+        'Networking': 'Prepare conversation starters and business card organization systems.'
+      },
+      'small law firm': {
+        'Multi-tasking': 'Use task-switching techniques and priority matrices. Batch similar activities together.',
+        'Client Relations': 'Develop personal client management systems. Create follow-up reminder systems.',
+        'Resource Management': 'Organize legal research efficiently. Use templates for common documents.',
+        'Work-Life Balance': 'Set clear boundaries between work and personal time. Use separate spaces for different activities.'
+      },
+      'corporate legal': {
+        'Internal Meetings': 'Prepare agenda templates and talking points. Use visual aids for complex legal concepts.',
+        'Compliance Tracking': 'Create visual compliance calendars and reminder systems. Use automated tracking tools.',
+        'Cross-Department Work': 'Develop communication bridges with non-legal teams. Create simplified legal explanations.',
+        'Policy Development': 'Use flowcharts and visual guides for policy creation. Test policies with diverse user groups.'
+      },
+
+      // General environments
+      'open office': {
+        'Noise Management': 'Use noise-canceling headphones and white noise apps. Create visual "do not disturb" signals.',
+        'Distraction Control': 'Position desk to minimize visual distractions. Use privacy screens and desk organizers.',
+        'Social Navigation': 'Prepare small talk topics and polite interruption phrases. Schedule focused work time.',
+        'Sensory Regulation': 'Keep sensory tools at desk (fidgets, stress balls). Use blue light filters on screens.'
+      },
+      'remote work': {
+        'Home Office Setup': 'Create dedicated work zones with proper lighting. Use ergonomic furniture and equipment.',
+        'Time Boundaries': 'Use visual cues to separate work and personal time. Create start/end work rituals.',
+        'Communication': 'Use video call templates and meeting agendas. Practice virtual presentation skills.',
+        'Isolation Management': 'Schedule regular check-ins with colleagues. Join virtual coworking sessions.'
+      },
+      'fast-paced': {
+        'Priority Management': 'Use urgent/important matrices and daily priority lists. Practice quick decision-making techniques.',
+        'Stress Response': 'Develop rapid stress-relief techniques (breathing, grounding). Create calm-down spaces.',
+        'Energy Management': 'Plan high-energy tasks for peak times. Use micro-recovery techniques throughout the day.',
+        'Flexibility': 'Practice adaptability exercises. Create backup plans for common scenarios.'
+      }
+    }
+
+    return tips[environment] || {
+      'General Organization': 'Create systems that work for your specific work environment and neurodivergent needs.',
+      'Communication': 'Develop clear communication strategies appropriate for your workplace culture.',
+      'Time Management': 'Use tools and techniques that align with your work demands and personal strengths.',
+      'Self-Care': 'Prioritize strategies that help you thrive in your specific professional context.'
+    }
+  }
+
   const generateMockToolkit = (userPrompt: string) => {
-    const profession = extractProfession(userPrompt)
-    const condition = extractCondition(userPrompt)
+    const analysis = analyzeWorkContext(userPrompt)
+    const { profession, environment, condition, challenges } = analysis
+    
+    const environmentTips = environment ? generateEnvironmentSpecificTips(profession, environment, condition) : {}
+    const environmentName = environment || 'workplace'
     
     return `
       <div class="space-y-6">
         <div class="border-l-4 border-blue-500 pl-4 mb-6">
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">Personalized Toolkit for ${profession}</h3>
-          <p class="text-gray-600">Tailored for ${condition} professionals</p>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Personalized Toolkit for ${profession.charAt(0).toUpperCase() + profession.slice(1)}s</h3>
+          <p class="text-gray-600">Tailored for ${condition} professionals ${environment ? `in ${environment} settings` : ''}</p>
+          ${challenges.length > 0 ? `<p class="text-sm text-blue-600 mt-1">Focusing on: ${challenges.join(', ')}</p>` : ''}
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white rounded-lg p-6 shadow-sm border">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
               <span class="bg-blue-100 p-1 rounded mr-2">📋</span>
-              Daily Workflow Template
+              ${environment ? `${environmentName.charAt(0).toUpperCase() + environmentName.slice(1)} Workflow` : 'Daily Workflow Template'}
             </h4>
             <ul class="space-y-2 text-sm text-gray-600">
-              <li>• Morning routine checklist</li>
-              <li>• Task prioritization matrix</li>
-              <li>• Break scheduling system</li>
-              <li>• End-of-day review template</li>
+              ${environment && environment.includes('clinic') ? `
+                <li>• Patient appointment color-coding system</li>
+                <li>• Treatment room preparation checklist</li>
+                <li>• Client communication templates</li>
+                <li>• End-of-day inventory review</li>
+              ` : environment && environment.includes('firm') ? `
+                <li>• Billable hour tracking templates</li>
+                <li>• Case file organization system</li>
+                <li>• Client meeting preparation guide</li>
+                <li>• Document review checklist</li>
+              ` : `
+                <li>• Morning routine checklist</li>
+                <li>• Task prioritization matrix</li>
+                <li>• Break scheduling system</li>
+                <li>• End-of-day review template</li>
+              `}
             </ul>
-            <button onclick="window.handleToolkitDownload('Daily Workflow Template for ${profession}s with ${condition}')" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+            <button onclick="window.handleToolkitDownload('${environmentName} Workflow Template for ${profession}s with ${condition}')" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
               Download Template
             </button>
           </div>
@@ -142,15 +326,27 @@ startxref
           <div class="bg-white rounded-lg p-6 shadow-sm border">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
               <span class="bg-green-100 p-1 rounded mr-2">🧠</span>
-              Focus Enhancement Tools
+              ${challenges.includes('focus') ? 'Advanced Focus Enhancement' : 'Focus Enhancement Tools'}
             </h4>
             <ul class="space-y-2 text-sm text-gray-600">
-              <li>• Pomodoro timer settings</li>
-              <li>• Distraction blocking techniques</li>
-              <li>• Sensory regulation strategies</li>
-              <li>• Energy management guide</li>
+              ${environment === 'open office' ? `
+                <li>• Noise-canceling headphone schedule</li>
+                <li>• Visual "do not disturb" signals</li>
+                <li>• Desk positioning strategies</li>
+                <li>• Sensory regulation toolkit</li>
+              ` : environment && environment.includes('emergency') ? `
+                <li>• Crisis focus techniques</li>
+                <li>• Rapid priority assessment tools</li>
+                <li>• Stress-response management</li>
+                <li>• Team communication protocols</li>
+              ` : `
+                <li>• Pomodoro timer settings</li>
+                <li>• Distraction blocking techniques</li>
+                <li>• Sensory regulation strategies</li>
+                <li>• Energy management guide</li>
+              `}
             </ul>
-            <button onclick="window.handleToolkitDownload('Focus Enhancement Guide for ${profession}s with ${condition}')" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors">
+            <button onclick="window.handleToolkitDownload('Focus Enhancement Guide for ${profession}s with ${condition} in ${environmentName}')" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors">
               Download Guide
             </button>
           </div>
@@ -158,15 +354,27 @@ startxref
           <div class="bg-white rounded-lg p-6 shadow-sm border">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
               <span class="bg-purple-100 p-1 rounded mr-2">💬</span>
-              Communication Scripts
+              ${environment && environment.includes('firm') ? 'Legal Communication Scripts' : environment && environment.includes('clinic') ? 'Client Communication Scripts' : 'Communication Scripts'}
             </h4>
             <ul class="space-y-2 text-sm text-gray-600">
-              <li>• Meeting preparation templates</li>
-              <li>• Email response frameworks</li>
-              <li>• Accommodation request scripts</li>
-              <li>• Feedback conversation guides</li>
+              ${environment && environment.includes('big') && environment.includes('firm') ? `
+                <li>• Partner meeting preparation</li>
+                <li>• Client presentation frameworks</li>
+                <li>• Billable hour discussions</li>
+                <li>• Networking conversation starters</li>
+              ` : environment && environment.includes('small') && environment.includes('clinic') ? `
+                <li>• Treatment explanation scripts</li>
+                <li>• Cost discussion templates</li>
+                <li>• Appointment scheduling phrases</li>
+                <li>• Emergency situation communication</li>
+              ` : `
+                <li>• Meeting preparation templates</li>
+                <li>• Email response frameworks</li>
+                <li>• Accommodation request scripts</li>
+                <li>• Feedback conversation guides</li>
+              `}
             </ul>
-            <button onclick="window.handleToolkitDownload('Communication Scripts for ${profession}s with ${condition}')" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition-colors">
+            <button onclick="window.handleToolkitDownload('Communication Scripts for ${profession}s with ${condition} in ${environmentName}')" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition-colors">
               Download Scripts
             </button>
           </div>
@@ -174,22 +382,47 @@ startxref
           <div class="bg-white rounded-lg p-6 shadow-sm border">
             <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
               <span class="bg-orange-100 p-1 rounded mr-2">📊</span>
-              Progress Tracking
+              ${challenges.includes('time management') ? 'Advanced Time Tracking' : 'Progress Tracking'}
             </h4>
             <ul class="space-y-2 text-sm text-gray-600">
-              <li>• Weekly goal setting sheets</li>
-              <li>• Mood and energy tracker</li>
-              <li>• Accomplishment log</li>
-              <li>• Challenge identification tool</li>
+              ${environment && environment.includes('firm') ? `
+                <li>• Billable hour optimization sheets</li>
+                <li>• Case progress tracking</li>
+                <li>• Client satisfaction monitoring</li>
+                <li>• Professional development log</li>
+              ` : environment && environment.includes('clinic') ? `
+                <li>• Patient outcome tracking</li>
+                <li>• Treatment success metrics</li>
+                <li>• Client relationship monitoring</li>
+                <li>• Continuing education tracker</li>
+              ` : `
+                <li>• Weekly goal setting sheets</li>
+                <li>• Mood and energy tracker</li>
+                <li>• Accomplishment log</li>
+                <li>• Challenge identification tool</li>
+              `}
             </ul>
-            <button onclick="window.handleToolkitDownload('Progress Tracking System for ${profession}s with ${condition}')" class="mt-4 bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700 transition-colors">
+            <button onclick="window.handleToolkitDownload('Progress Tracking System for ${profession}s with ${condition} in ${environmentName}')" class="mt-4 bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700 transition-colors">
               Download Tracker
             </button>
           </div>
         </div>
         
+        ${Object.keys(environmentTips).length > 0 ? `
         <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border">
-          <h4 class="font-semibold text-gray-900 mb-3">💡 Pro Tips for ${profession}s with ${condition}</h4>
+          <h4 class="font-semibold text-gray-900 mb-3">💡 Specialized Tips for ${profession.charAt(0).toUpperCase() + profession.slice(1)}s in ${environmentName.charAt(0).toUpperCase() + environmentName.slice(1)} Settings</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+            ${Object.entries(environmentTips).map(([category, tip]) => `
+              <div>
+                <strong>${category}:</strong>
+                <p>${tip}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : `
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border">
+          <h4 class="font-semibold text-gray-900 mb-3">💡 Pro Tips for ${profession.charAt(0).toUpperCase() + profession.slice(1)}s with ${condition}</h4>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
             <div>
               <strong>Environment Setup:</strong>
@@ -209,20 +442,9 @@ startxref
             </div>
           </div>
         </div>
+        `}
       </div>
     `
-  }
-
-  const extractProfession = (prompt: string): string => {
-    const professions = ['veterinarian', 'teacher', 'engineer', 'designer', 'developer', 'nurse', 'accountant', 'lawyer', 'manager', 'consultant']
-    const found = professions.find(prof => prompt.toLowerCase().includes(prof))
-    return found || 'Professional'
-  }
-
-  const extractCondition = (prompt: string): string => {
-    const conditions = ['ADHD', 'autism', 'dyslexia', 'bipolar']
-    const found = conditions.find(cond => prompt.toLowerCase().includes(cond.toLowerCase()))
-    return found || 'neurodiverse'
   }
 
   // Add global download handler for generated toolkit buttons
@@ -244,7 +466,7 @@ startxref
             Generate Your Personalized Toolkit
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Describe your profession, challenges, and neurodivergent needs. Get customized resources in seconds.
+            Describe your profession, work environment, and neurodivergent needs. Get customized resources tailored to your specific situation.
           </p>
         </div>
 
@@ -258,10 +480,20 @@ startxref
                 id="prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Example: I'm a veterinarian with ADHD who struggles with keeping track of multiple patients and their treatment schedules. I need help organizing my daily workflow and staying focused during long procedures."
+                placeholder="Example: I'm a veterinarian with ADHD working in a busy small animal clinic. I struggle with keeping track of multiple patients and their treatment schedules during hectic days. I need help organizing my workflow and staying focused during long procedures."
                 className="w-full h-32 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder-gray-500"
                 disabled={isGenerating}
               />
+            </div>
+
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-2">💡 For better personalization, mention:</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Your specific work environment (e.g., "small clinic", "big law firm", "open office")</li>
+                <li>• Your neurodivergent condition (ADHD, autism, dyslexia, etc.)</li>
+                <li>• Specific challenges you face (time management, focus, communication)</li>
+                <li>• Your role and daily responsibilities</li>
+              </ul>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -273,12 +505,12 @@ startxref
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Generating Your Toolkit...</span>
+                    <span>Analyzing & Generating...</span>
                   </>
                 ) : (
                   <>
                     <Send className="h-5 w-5" />
-                    <span>Generate Toolkit</span>
+                    <span>Generate Personalized Toolkit</span>
                   </>
                 )}
               </button>
@@ -288,15 +520,15 @@ startxref
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3 text-sm text-gray-600">
               <CheckCircle className="h-5 w-5 text-green-500" />
-              <span>Instant generation</span>
+              <span>Smart keyword detection</span>
             </div>
             <div className="flex items-center space-x-3 text-sm text-gray-600">
               <FileText className="h-5 w-5 text-blue-500" />
-              <span>Downloadable resources</span>
+              <span>Environment-specific advice</span>
             </div>
             <div className="flex items-center space-x-3 text-sm text-gray-600">
               <Download className="h-5 w-5 text-purple-500" />
-              <span>Ready-to-use templates</span>
+              <span>Tailored resources</span>
             </div>
           </div>
         </div>
